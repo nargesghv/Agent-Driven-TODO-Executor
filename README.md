@@ -10,8 +10,6 @@ You tell it what you want to build (like "create a landing page for my product")
 3. Lets you review and edit tasks
 4. Executes them step by step with full logging
 
-Think of it as having a smart assistant that not only plans your project but also helps execute it.
-
 ## Quick Start
 
 ```bash
@@ -21,8 +19,6 @@ pip install -r requirements.txt
 # Run it
 python main.py
 ```
-
-That's it. The agent will guide you through the rest.
 
 ## How It Works
 
@@ -138,8 +134,6 @@ You: "Add mobile optimization to task #3"
 Agent: I'll add 'ensure mobile responsiveness' to the description
       Apply? (y/n)
 ```
-
-No rigid forms. Just natural conversation.
 
 ### Complete Lifecycle
 Every project gets proper phases:
@@ -282,7 +276,7 @@ Result: SUCCESS
 
 ## Smart Editing Example
 
-The editing feature is really nice. You just tell it what you want:
+You just tell it what you want to edit:
 
 ```bash
 Your choice: e
@@ -319,14 +313,11 @@ If you say "n", it asks what else you want to change. Keeps going until you're h
 ## Technical Details
 
 ### No Frameworks
-This doesn't use LangChain, LangGraph, or similar. Just:
+This Project doesn't use LangChain, LangGraph, or similar. Just:
 - Pure Python for the agent loop
 - OpenAI SDK for LLM calls
-- That's it
 
-Why? Because you can see exactly how it works. No magic abstractions.
-
-### How TODO Generation Works
+### How Generation Works
 
 ```python
 # Simplified version of what happens:
@@ -342,6 +333,7 @@ Why? Because you can see exactly how it works. No magic abstractions.
 5. Sends to OpenAI with JSON output format
 6. Parses tasks with: id, title, description, phase, reasoning
 7. Displays organized by phase
+8.Run Tasks
 ```
 
 ### Execution Loop
@@ -362,35 +354,6 @@ while tasks_remain:
 - Python 3.8+
 - OpenAI API key
 - 3 Python packages (openai, python-dotenv, colorama)
-
-## Limitations
-
-**What it does:**
-- Plans projects intelligently
-- Breaks down goals into tasks
-- Adapts to your skill level
-- Executes tasks with LLM reasoning
-
-**What it doesn't do (yet):**
-- Actually run code or install things
-- Parallel task execution
-- Persistent state between runs
-- Task dependencies (runs in order)
-
-It's a smart planner and executor, not a full automation system. Think of it as a very smart assistant.
-
-## Why This Is Useful
-
-Instead of:
-1. Manually breaking down your project
-2. Forgetting to add testing
-3. Missing deployment steps
-4. Having to track everything yourself
-
-You just:
-1. Tell it what you want
-2. Review the plan
-3. Let it guide you through execution
 
 ## Troubleshooting
 
