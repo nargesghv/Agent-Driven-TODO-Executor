@@ -271,9 +271,9 @@
         <div class="chat-container" id="chatContainer">
             <div class="message agent">
                 <div class="message-content">
-                    Hi! I'm your AI agent assistant. I can help you plan and execute projects by breaking them into manageable tasks.
+                    Hello, I'm your AI agent assistant. I can help you plan and execute projects by breaking them into manageable tasks.
                     <br><br>
-                    What would you like to build today?
+                    What is your Goal? tell me your Goal I will return a to-do list for the Goal
                 </div>
             </div>
         </div>
@@ -346,7 +346,7 @@
 
         function askExpertiseLevel() {
             currentState = 'expertise_select';
-            addMessage('👤 What\'s your technical expertise level?<br><small>This helps me provide the right level of detail in the TODO list.</small>', 'agent');
+            addMessage(' What\'s your technical expertise level?<br><small>This helps me provide the right level of detail in the TODO list.</small>', 'agent');
             
             const options = document.getElementById('options');
             options.className = 'options';
@@ -777,7 +777,7 @@
                 
                 ws.onerror = (error) => {
                     console.error('WebSocket error:', error);
-                    addMessage('❌ WebSocket connection error. Please check if backend is running.', 'system');
+                    addMessage(' WebSocket connection error. Please check if backend is running.', 'system');
                 };
                 
                 ws.onclose = () => {
