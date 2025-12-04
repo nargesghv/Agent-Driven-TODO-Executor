@@ -17,7 +17,7 @@ class TaskStatus(Enum):
 
 class Task:
     """
-    Represents a single task in the TODO list
+    Represents a single task 
     """
     
     def __init__(self, task_id: int, title: str, description: str, status: str = "pending",
