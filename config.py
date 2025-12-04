@@ -15,19 +15,13 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 # If no API key is found, show a helpful error message
 if not OPENAI_API_KEY:
     print("=" * 60)
-    print("⚠️  WARNING: OPENAI_API_KEY not found!")
+    print(" WARNING: OPENAI_API_KEY not found")
     print("=" * 60)
     print("Please set your API key in one of these ways:")
     print("1. Create a .env file with: OPENAI_API_KEY=your-key-here")
     print("2. Set environment variable: export OPENAI_API_KEY=your-key-here")
     print("=" * 60)
 
-# Valid OpenAI models (Dec 2024):
-# - gpt-4o-mini (RECOMMENDED - fast, efficient, cheap)
-# - gpt-4o (latest, best quality)
-# - gpt-4-turbo (high quality)
-# - gpt-4 (standard, slower)
-# - gpt-3.5-turbo (fastest, cheapest)
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 # Agent Configuration
