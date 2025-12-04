@@ -264,7 +264,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🤖 Agent-Driven TODO Executor</h1>
+            <h1> Agent-Driven TODO Executor</h1>
             <div class="subtitle">Tell me what you want to build, and I'll break it down into tasks</div>
         </div>
 
@@ -307,14 +307,14 @@
                     mode: 'cors'
                 });
                 if (response.ok) {
-                    console.log('✅ Backend connected');
+                    console.log('Backend connected');
                 } else {
-                    console.error('❌ Backend not responding');
-                    addMessage('⚠️ Cannot connect to backend. Make sure backend.py is running on port 8007', 'system');
+                    console.error('Backend not responding');
+                    addMessage('Cannot connect to backend. Make sure backend.py is running on port 8007', 'system');
                 }
             } catch (error) {
-                console.error('❌ Backend connection failed:', error);
-                addMessage('⚠️ Cannot connect to backend. Please start the backend first:<br><code>python backend.py</code>', 'system');
+                console.error('Backend connection failed:', error);
+                addMessage('Cannot connect to backend. Please start the backend first:<br><code>python backend.py</code>', 'system');
             }
         });
 
@@ -351,9 +351,9 @@
             const options = document.getElementById('options');
             options.className = 'options';
             options.innerHTML = `
-                <button class="option-btn" onclick="selectExpertise('beginner')">🌱 Beginner - Very detailed steps</button>
-                <button class="option-btn" onclick="selectExpertise('intermediate')">🔧 Intermediate - Balanced detail</button>
-                <button class="option-btn" onclick="selectExpertise('expert')">🚀 Expert - High-level tasks</button>
+                <button class="option-btn" onclick="selectExpertise('beginner')"> Beginner - Very detailed steps</button>
+                <button class="option-btn" onclick="selectExpertise('intermediate')"> Intermediate - Balanced detail</button>
+                <button class="option-btn" onclick="selectExpertise('expert')"> Expert - High-level tasks</button>
             `;
             
             document.getElementById('userInput').disabled = true;
@@ -375,8 +375,8 @@
             const options = document.getElementById('options');
             options.className = 'options';
             options.innerHTML = `
-                <button class="option-btn" onclick="selectMode('confirm')">1️⃣ Confirm Mode - Review before execution</button>
-                <button class="option-btn" onclick="selectMode('auto')">2️⃣ Auto Mode - Execute immediately</button>
+                <button class="option-btn" onclick="selectMode('confirm')"> Confirm Mode - Review before execution</button>
+                <button class="option-btn" onclick="selectMode('auto')"> Auto Mode - Execute immediately</button>
             `;
             
             document.getElementById('userInput').disabled = true;
@@ -537,10 +537,10 @@
             if (currentMode === 'confirm') {
                 // Confirm mode - show all options
                 options.innerHTML = `
-                    <button class="option-btn" onclick="approveAndExecute()">✅ Approve & Execute</button>
-                    <button class="option-btn" onclick="startEdit()">✏️ Edit Task</button>
-                    <button class="option-btn" onclick="regenerate()">🔄 Regenerate</button>
-                    <button class="option-btn" onclick="cancel()">❌ Cancel</button>
+                    <button class="option-btn" onclick="approveAndExecute()"> Approve & Execute</button>
+                    <button class="option-btn" onclick="startEdit()"> Edit Task</button>
+                    <button class="option-btn" onclick="regenerate()"> Regenerate</button>
+                    <button class="option-btn" onclick="cancel()"> Cancel</button>
                 `;
             } else {
                 // Auto mode - execute immediately
@@ -627,7 +627,7 @@
                 
                 if (data.status === 'success') {
                     addMessage(`
-                        <strong>📝 My interpretation:</strong><br>
+                        <strong> My interpretation:</strong><br>
                         ${data.interpretation}<br><br>
                         <strong>Changes to apply:</strong><br>
                         ${data.changes_made.map(c => `✓ ${c}`).join('<br>')}
@@ -637,9 +637,9 @@
                     const options = document.getElementById('options');
                     options.className = 'options';
                     options.innerHTML = `
-                        <button class="option-btn" onclick="applyEdit(${JSON.stringify(data.updated_task).replace(/"/g, '&quot;')})">✅ Apply Changes</button>
-                        <button class="option-btn" onclick="retryEdit()">🔄 Try Different Edit</button>
-                        <button class="option-btn" onclick="cancelEdit()">❌ Cancel Edit</button>
+                        <button class="option-btn" onclick="applyEdit(${JSON.stringify(data.updated_task).replace(/"/g, '&quot;')})"> Apply Changes</button>
+                        <button class="option-btn" onclick="retryEdit()"> Try Different Edit</button>
+                        <button class="option-btn" onclick="cancelEdit()"> Cancel Edit</button>
                     `;
                     
                     window.currentEditData = data.updated_task;
@@ -655,7 +655,7 @@
 
         async function applyEdit(updatedTask) {
             try {
-                console.log('🔵 Applying edit...');
+                console.log(' Applying edit...');
                 console.log('Session ID:', sessionId);
                 console.log('Task ID:', editingTaskId);
                 
@@ -671,18 +671,18 @@
                 console.log('Apply edit response:', data);
                 
                 if (data.status === 'success') {
-                    addMessage('✅ Task updated successfully!', 'system');
+                    addMessage(' Task updated successfully!', 'system');
                     
                     // Refresh the TODO list
-                    console.log('🔵 Refreshing tasks from session:', sessionId);
+                    console.log(' Refreshing tasks from session:', sessionId);
                     const refreshResponse = await fetch(`${API_URL}/api/get-tasks/${sessionId}`);
                     
                     if (!refreshResponse.ok) {
-                        console.error('❌ Refresh failed:', refreshResponse.status, refreshResponse.statusText);
+                        console.error(' Refresh failed:', refreshResponse.status, refreshResponse.statusText);
                         addMessage(`Error refreshing tasks: ${refreshResponse.status} ${refreshResponse.statusText}`, 'system');
                     } else {
                         const refreshData = await refreshResponse.json();
-                        console.log('✅ Refresh response:', refreshData);
+                        console.log(' Refresh response:', refreshData);
                         
                         if (refreshData.status === 'success') {
                             displayTodos(refreshData.tasks, refreshData.total);
@@ -701,7 +701,7 @@
                 document.getElementById('sendBtn').onclick = sendMessage;
                 
             } catch (error) {
-                console.error('❌ Error in applyEdit:', error);
+                console.error(' Error in applyEdit:', error);
                 addMessage(`Error: ${error.message}`, 'system');
             }
         }
@@ -742,14 +742,14 @@
                 const ws = new WebSocket(`ws://127.0.0.1:8007/ws/${sessionId}`);
                 
                 ws.onopen = () => {
-                    console.log('✅ WebSocket connected');
+                    console.log(' WebSocket connected');
                 };
                 
                 ws.onmessage = (event) => {
                     const data = JSON.parse(event.data);
                     
                     if (data.type === 'task_start') {
-                        addMessage(`🔄 Executing: <strong>${data.task.title}</strong>`, 'system');
+                        addMessage(` Executing: <strong>${data.task.title}</strong>`, 'system');
                     } else if (data.type === 'task_complete') {
                         const statusClass = data.status === 'done' ? 'done' : (data.status === 'failed' ? 'failed' : 'progress');
                         addMessage(`
