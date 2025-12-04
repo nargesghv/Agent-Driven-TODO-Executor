@@ -1,5 +1,5 @@
 """
-Simple FastAPI Backend for Agent-Driven TODO Executor
+Simple FastAPI Backend 
 Port: 8007
 """
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
@@ -247,7 +247,7 @@ async def get_tasks(session_id: str):
         
         agent = sessions.get(session_id)
         if not agent:
-            print(f"❌ Session {session_id} not found!")
+            print(f" Session {session_id} not found!")
             return JSONResponse(
                 status_code=404,
                 content={"status": "error", "message": f"Session {session_id} not found. Available: {list(sessions.keys())}"}
@@ -277,7 +277,7 @@ async def get_tasks(session_id: str):
         }
     except Exception as e:
         import traceback
-        print(f"❌ Error getting tasks: {e}\n{traceback.format_exc()}")
+        print(f" Error getting tasks: {e}\n{traceback.format_exc()}")
         return JSONResponse(
             status_code=500,
             content={"status": "error", "message": str(e)}
@@ -293,7 +293,7 @@ async def apply_edit(session_id: str, task_id: int, request: UpdateTaskRequest):
         
         agent = sessions.get(session_id)
         if not agent:
-            print(f"❌ Session {session_id} not found!")
+            print(f" Session {session_id} not found!")
             return JSONResponse(
                 status_code=404,
                 content={"status": "error", "message": f"Session {session_id} not found"}
