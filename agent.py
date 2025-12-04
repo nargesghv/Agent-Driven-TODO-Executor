@@ -45,7 +45,7 @@ class Agent:
         Returns:
             User's goal as string
         """
-        self.print_header("🤖 Agent-Driven TODO Executor", Fore.CYAN)
+        self.print_header(" Agent-Driven TODO Executor", Fore.CYAN)
         print(f"{Fore.YELLOW}Welcome! I'll help you break down your goal into tasks and execute them.{Style.RESET_ALL}\n")
         
         # Ask about expertise level for adaptive detail
@@ -179,7 +179,7 @@ class Agent:
             task = self.todo_list.get_task_by_id(task_id)
             
             if not task:
-                print(f"{Fore.RED}❌ Task #{task_id} not found.{Style.RESET_ALL}")
+                print(f"{Fore.RED} Task #{task_id} not found.{Style.RESET_ALL}")
                 return
             
             # Show current task clearly
@@ -192,7 +192,7 @@ class Agent:
             print(f"{Fore.CYAN}{'─' * 60}{Style.RESET_ALL}\n")
             
             # Get edit request in natural language
-            print(f"{Fore.YELLOW}💡 Tell me how you want to edit this task:{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW} Tell me how you want to edit this task:{Style.RESET_ALL}")
             print(f"{Fore.LIGHTBLACK_EX}Examples:{Style.RESET_ALL}")
             print(f"{Fore.LIGHTBLACK_EX}  - \"Change the title to 'Build responsive landing page'\"{Style.RESET_ALL}")
             print(f"{Fore.LIGHTBLACK_EX}  - \"Add 'include mobile optimization' to the description\"{Style.RESET_ALL}")
@@ -264,7 +264,7 @@ class Agent:
                     updated_data = self.llm.interpret_edit_request(edit_request, current_task_data)
                     
                     # Show new interpretation
-                    print(f"\n{Fore.CYAN}📝 My interpretation:{Style.RESET_ALL}")
+                    print(f"\n{Fore.CYAN} My interpretation:{Style.RESET_ALL}")
                     print(f"{Fore.LIGHTBLACK_EX}{updated_data.get('interpretation', 'Applied your changes')}{Style.RESET_ALL}\n")
                     
                     # Show new changes
@@ -301,7 +301,7 @@ class Agent:
         
         # Show reasoning if available
         if task.reasoning:
-            print(f"   {Fore.BLUE}💡 Why: {task.reasoning}{Style.RESET_ALL}")
+            print(f"   {Fore.BLUE} Why: {task.reasoning}{Style.RESET_ALL}")
         print()
         
         # Log execution start
@@ -404,7 +404,7 @@ class Agent:
             success = self.generate_todo_list(user_goal)
             
             if not success:
-                print(f"{Fore.RED}Failed to generate TODO list. Exiting.{Style.RESET_ALL}")
+                print(f"{Fore.RED} Failed to generate TODO list. Exiting.{Style.RESET_ALL}")
                 return
             
             # Step 4: Confirmation/Execution loop
