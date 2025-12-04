@@ -3,13 +3,7 @@ Configuration
 """
 import os
 from dotenv import load_dotenv
-
-# Load environment variables
 load_dotenv()
-
-# OpenAI Configuration
-# Get your API key from: https://platform.openai.com/api-keys
-# IMPORTANT: Set your API key in the .env file or as an environment variable
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # If no API key is found, show a helpful error message
