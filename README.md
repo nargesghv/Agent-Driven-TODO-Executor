@@ -177,12 +177,13 @@ agent-todo-executor/
 **Option 1: Edit config.py**
 ```python
 OPENAI_API_KEY = "your-key-here"
+OPENAI_MODEL=
 ```
 
-**Option 2: Use .env file** (recommended)
+**Option 2: Use .env file** 
 ```bash
 echo "OPENAI_API_KEY=your-key-here" > .env
-echo "OPENAI_MODEL=gpt-4o-mini" >> .env
+echo "OPENAI_MODEL=Model" >> .env
 ```
 
 ### Change the Model
@@ -380,6 +381,5 @@ This is a learning project. Feel free to:
 - Add more tools in tools.py
 - Improve the prompts in llm.py
 - Add features you need
-
 ---
 
