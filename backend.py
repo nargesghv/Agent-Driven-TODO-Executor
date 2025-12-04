@@ -268,7 +268,7 @@ async def get_tasks(session_id: str):
                 "status": task.status.value
             })
         
-        print(f"✅ Returning {len(agent.todo_list.tasks)} tasks for session {session_id}")
+        print(f" Returning {len(agent.todo_list.tasks)} tasks for session {session_id}")
         
         return {
             "status": "success",
