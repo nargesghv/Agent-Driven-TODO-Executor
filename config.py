@@ -22,7 +22,7 @@ if not OPENAI_API_KEY:
     print("2. Set environment variable: export OPENAI_API_KEY=your-key-here")
     print("=" * 60)
 
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "")
 
 # Agent Configuration
 MAX_RETRIES = 3
