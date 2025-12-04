@@ -113,7 +113,7 @@ project/
 
 ---
 
-## Need Help?
+## Need Help or extra assist
 
 1. Check backend terminal for errors
 2. Open browser console (F12) for frontend errors
