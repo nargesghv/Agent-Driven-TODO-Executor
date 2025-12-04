@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent TODO Executor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #0a0a0a;
+        }
+
+        .header {
+            padding: 20px 30px;
+            background: #1e1e1e;
+            border-bottom: 1px solid #333;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .header .subtitle {
+            font-size: 13px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 30px;
+            background: #0a0a0a;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            text-align: right;
+        }
+
+        .message-content {
+            display: inline-block;
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            text-align: left;
+            line-height: 1.5;
+        }
+
+        .message.user .message-content {
+            background: #2b5278;
+            color: #fff;
+        }
+
+        .message.agent .message-content {
+            background: #1e1e1e;
+            color: #e0e0e0;
+            border: 1px solid #333;
+        }
+
+        .message.system .message-content {
+            background: #1a2a1a;
+            color: #90ee90;
+            border: 1px solid #2a4a2a;
+            max-width: 100%;
+        }
+
+        .todo-list {
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .todo-phase {
+            margin-bottom: 15px;
+        }
+
+        .phase-header {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a9eff;
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #333;
+        }
+
+        .todo-item {
+            padding: 8px 0;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .todo-item .task-id {
+            color: #ffa500;
+            font-weight: 600;
+        }
+
+        .todo-item .task-title {
+            color: #fff;
+        }
+
+        .todo-item .task-desc {
+            color: #888;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-left: 8px;
+        }
+
+        .status-pending { background: #444; color: #aaa; }
+        .status-progress { background: #4a5000; color: #ffeb3b; }
+        .status-done { background: #0a4a0a; color: #90ee90; }
+        .status-failed { background: #4a0a0a; color: #ff6b6b; }
+
+        .input-area {
+            padding: 20px 30px;
+            background: #1e1e1e;
+            border-top: 1px solid #333;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 14px;
+            font-family: inherit;
+            resize: none;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #4a9eff;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: #4a9eff;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #3a7edf;
+        }
+
+        button:disabled {
+            background: #444;
+            cursor: not-allowed;
+        }
+
+        .options {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .option-btn {
+            padding: 8px 16px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .option-btn:hover {
+            background: #3a3a3a;
+        }
+
+        .loading {
+            display: inline-block;
+            margin-left: 8px;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Agent-Driven TODO Executor</h1>
+            <div class="subtitle">Tell me what you want to build, and I'll break it down into tasks</div>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="message agent">
+                <div class="message-content">
+                    Hi! I'm your AI agent assistant. I can help you plan and execute projects by breaking them into manageable tasks.
+                    <br><br>
+                    What would you like to build today?
+                </div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-group">
+                <div class="input-wrapper">
+                    <input type="text" id="userInput" placeholder="Describe your goal (e.g., 'Build a landing page for my product')..." />
+                </div>
+                <button id="sendBtn" onclick="sendMessage()">Send</button>
+            </div>
+            <div id="options" class="options hidden"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:8007';
+        let sessionId = null;
+        let currentGoal = '';
+        let currentQuestions = [];
+        let currentMode = 'confirm'; // confirm or auto
+        let currentExpertise = 'intermediate'; // beginner, intermediate, expert
+        let currentState = 'initial'; // initial, expertise_select, mode_select, questions, confirm, executing
+        let allTasks = {}; // Store all tasks for editing
+        
+        // Check backend connection on load
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch(`${API_URL}/`, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                if (response.ok) {
+                    console.log('✅ Backend connected');
+                } else {
+                    console.error('❌ Backend not responding');
+                    addMessage('⚠️ Cannot connect to backend. Make sure backend.py is running on port 8007', 'system');
+                }
+            } catch (error) {
+                console.error('❌ Backend connection failed:', error);
+                addMessage('⚠️ Cannot connect to backend. Please start the backend first:<br><code>python backend.py</code>', 'system');
+            }
+        });
+
+        function addMessage(content, type = 'agent') {
+            const chat = document.getElementById('chatContainer');
+            const msg = document.createElement('div');
+            msg.className = `message ${type}`;
+            msg.innerHTML = `<div class="message-content">${content}</div>`;
+            chat.appendChild(msg);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            addMessage(message, 'user');
+            input.value = '';
+            
+            if (currentState === 'initial') {
+                currentGoal = message;
+                askExpertiseLevel();
+            } else if (currentState === 'questions') {
+                await handleAnswer(message);
+            }
+        }
+
+        function askExpertiseLevel() {
+            currentState = 'expertise_select';
+            addMessage('👤 What\'s your technical expertise level?<br><small>This helps me provide the right level of detail in the TODO list.</small>', 'agent');
+            
+            const options = document.getElementById('options');
+            options.className = 'options';
+            options.innerHTML = `
+                <button class="option-btn" onclick="selectExpertise('beginner')">🌱 Beginner - Very detailed steps</button>
+                <button class="option-btn" onclick="selectExpertise('intermediate')">🔧 Intermediate - Balanced detail</button>
+                <button class="option-btn" onclick="selectExpertise('expert')">🚀 Expert - High-level tasks</button>
+            `;
+            
+            document.getElementById('userInput').disabled = true;
+            document.getElementById('sendBtn').disabled = true;
+        }
+
+        function selectExpertise(level) {
+            currentExpertise = level;
+            document.getElementById('options').className = 'options hidden';
+            
+            addMessage(`✓ Expertise level: ${level.toUpperCase()}`, 'system');
+            askModeSelection();
+        }
+
+        function askModeSelection() {
+            currentState = 'mode_select';
+            addMessage('Choose execution mode:', 'agent');
+            
+            const options = document.getElementById('options');
+            options.className = 'options';
+            options.innerHTML = `
+                <button class="option-btn" onclick="selectMode('confirm')">1️⃣ Confirm Mode - Review before execution</button>
+                <button class="option-btn" onclick="selectMode('auto')">2️⃣ Auto Mode - Execute immediately</button>
+            `;
+            
+            document.getElementById('userInput').disabled = true;
+            document.getElementById('sendBtn').disabled = true;
+        }
+
+        async function selectMode(mode) {
+            currentMode = mode;
+            document.getElementById('options').className = 'options hidden';
+            document.getElementById('userInput').disabled = false;
+            document.getElementById('sendBtn').disabled = false;
+            
+            addMessage(`✓ Mode selected: ${mode.toUpperCase()}`, 'system');
+            await startSession();
+        }
+
+        async function startSession() {
+            try {
+                // Create session
+                const response = await fetch(`${API_URL}/api/start`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        goal: currentGoal,
+                        expertise_level: currentExpertise,
+                        mode: currentMode
+                    })
+                });
+                
+                const data = await response.json();
+                sessionId = data.session_id;
+                
+                // Analyze goal
+                addMessage('<span class="loading">Analyzing your goal</span>', 'system');
+                
+                const analyzeResponse = await fetch(`${API_URL}/api/analyze/${sessionId}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ goal: currentGoal })
+                });
+                
+                const analysis = await analyzeResponse.json();
+                
+                if (analysis.needs_clarification && analysis.questions.length > 0) {
+                    currentQuestions = analysis.questions;
+                    currentState = 'questions';
+                    askQuestion(0);
+                } else {
+                    await generateTodos();
+                }
+            } catch (error) {
+                addMessage(`Error: ${error.message}`, 'system');
+            }
+        }
+
+        let questionAnswers = [];
+
+        function askQuestion(index) {
+            if (index >= currentQuestions.length) {
+                generateTodos();
+                return;
+            }
+            
+            const q = currentQuestions[index];
+            addMessage(`🤔 ${q.question}`, 'agent');
+            
+            // Change handler for next question
+            document.getElementById('sendBtn').onclick = () => {
+                const input = document.getElementById('userInput');
+                const answer = input.value.trim();
+                if (answer) {
+                    addMessage(answer, 'user');
+                    questionAnswers.push(answer);
+                    input.value = '';
+                    askQuestion(index + 1);
+                }
+            };
+        }
+
+        async function generateTodos() {
+            try {
+                addMessage('<span class="loading">Generating your TODO list</span>', 'system');
+                
+                const requestBody = {
+                    goal: currentGoal,
+                    expertise_level: currentExpertise,
+                    mode: currentMode
+                };
+                
+                console.log('Generating TODOs with:', requestBody);
+                
+                const response = await fetch(`${API_URL}/api/generate/${sessionId}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(requestBody)
+                });
+                
+                const data = await response.json();
+                console.log('Generate response:', data);
+                
+                if (data.status === 'success') {
+                    displayTodos(data.tasks, data.total);
+                    
+                    if (currentMode === 'auto') {
+                        addMessage('✓ Auto mode - executing immediately...', 'system');
+                    }
+                    
+                    showConfirmOptions();
+                    currentState = 'confirm';
+                } else {
+                    addMessage(`Error: ${data.message || 'Failed to generate tasks'}`, 'system');
+                }
+            } catch (error) {
+                addMessage(`Error: ${error.message}`, 'system');
+                console.error('Generate error:', error);
+            }
+        }
+
+        function displayTodos(tasks, total) {
+            // Store tasks globally for editing
+            allTasks = tasks;
+            
+            const phaseIcons = {
+                'planning': '📐',
+                'development': '💻',
+                'testing': '🧪',
+                'deployment': '🚀'
+            };
+            
+            let html = `<div class="todo-list"><strong>📋 To-dos ${total}</strong><br><br>`;
+            
+            for (const [phase, phaseTasks] of Object.entries(tasks)) {
+                html += `<div class="todo-phase">`;
+                html += `<div class="phase-header">${phaseIcons[phase] || '📌'} ${phase.toUpperCase()}</div>`;
+                
+                phaseTasks.forEach(task => {
+                    html += `<div class="todo-item">`;
+                    html += `<span class="task-id">[#${task.id}]</span> `;
+                    html += `<span class="task-title">${task.title}</span>`;
+                    html += `<span class="status-badge status-pending">pending</span>`;
+                    if (task.description) {
+                        html += `<div class="task-desc">${task.description}</div>`;
+                    }
+                    html += `</div>`;
+                });
+                
+                html += `</div>`;
+            }
+            
+            html += `</div>`;
+            addMessage(html, 'system');
+        }
+
+        function showConfirmOptions() {
+            const options = document.getElementById('options');
+            options.className = 'options';
+            
+            if (currentMode === 'confirm') {
+                // Confirm mode - show all options
+                options.innerHTML = `
+                    <button class="option-btn" onclick="approveAndExecute()">✅ Approve & Execute</button>
+                    <button class="option-btn" onclick="startEdit()">✏️ Edit Task</button>
+                    <button class="option-btn" onclick="regenerate()">🔄 Regenerate</button>
+                    <button class="option-btn" onclick="cancel()">❌ Cancel</button>
+                `;
+            } else {
+                // Auto mode - execute immediately
+                setTimeout(() => approveAndExecute(), 1000);
+            }
+        }
+
+        function startEdit() {
+            document.getElementById('options').className = 'options hidden';
+            addMessage('Which task do you want to edit? Enter the task ID (the number in [#ID]):', 'agent');
+            
+            currentState = 'edit_select';
+            document.getElementById('sendBtn').onclick = handleEditSelection;
+        }
+
+        let editingTaskId = null;
+
+        async function handleEditSelection() {
+            const input = document.getElementById('userInput');
+            const taskId = parseInt(input.value.trim());
+            
+            if (isNaN(taskId)) {
+                addMessage('Please enter a valid task number', 'system');
+                return;
+            }
+            
+            addMessage(taskId.toString(), 'user');
+            input.value = '';
+            
+            editingTaskId = taskId;
+            
+            // Find and show the task
+            let foundTask = null;
+            for (const [phase, tasks] of Object.entries(allTasks)) {
+                const task = tasks.find(t => t.id === taskId);
+                if (task) {
+                    foundTask = task;
+                    break;
+                }
+            }
+            
+            if (!foundTask) {
+                addMessage(`Task #${taskId} not found. Please try again.`, 'system');
+                showConfirmOptions();
+                currentState = 'confirm';
+                document.getElementById('sendBtn').onclick = sendMessage;
+                return;
+            }
+            
+            addMessage(`
+                <strong>Current Task #${taskId}:</strong><br>
+                <strong>Title:</strong> ${foundTask.title}<br>
+                <strong>Description:</strong> ${foundTask.description}<br>
+                <strong>Phase:</strong> ${foundTask.phase}<br><br>
+                💡 Tell me how to edit this task (e.g., "Add mobile optimization", "Change title to X")
+            `, 'agent');
+            
+            currentState = 'edit_request';
+            document.getElementById('sendBtn').onclick = handleEditRequest;
+        }
+
+        async function handleEditRequest() {
+            const input = document.getElementById('userInput');
+            const editRequest = input.value.trim();
+            
+            if (!editRequest) return;
+            
+            addMessage(editRequest, 'user');
+            input.value = '';
+            
+            try {
+                addMessage('<span class="loading">Interpreting your edit request</span>', 'system');
+                
+                const response = await fetch(`${API_URL}/api/edit/${sessionId}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        task_id: editingTaskId,
+                        edit_request: editRequest
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    addMessage(`
+                        <strong>📝 My interpretation:</strong><br>
+                        ${data.interpretation}<br><br>
+                        <strong>Changes to apply:</strong><br>
+                        ${data.changes_made.map(c => `✓ ${c}`).join('<br>')}
+                    `, 'agent');
+                    
+                    // Show approve/reject options for this edit
+                    const options = document.getElementById('options');
+                    options.className = 'options';
+                    options.innerHTML = `
+                        <button class="option-btn" onclick="applyEdit(${JSON.stringify(data.updated_task).replace(/"/g, '&quot;')})">✅ Apply Changes</button>
+                        <button class="option-btn" onclick="retryEdit()">🔄 Try Different Edit</button>
+                        <button class="option-btn" onclick="cancelEdit()">❌ Cancel Edit</button>
+                    `;
+                    
+                    window.currentEditData = data.updated_task;
+                } else {
+                    addMessage(`Error: ${data.message}`, 'system');
+                    showConfirmOptions();
+                }
+            } catch (error) {
+                addMessage(`Error: ${error.message}`, 'system');
+                showConfirmOptions();
+            }
+        }
+
+        async function applyEdit(updatedTask) {
+            try {
+                console.log('🔵 Applying edit...');
+                console.log('Session ID:', sessionId);
+                console.log('Task ID:', editingTaskId);
+                
+                const editData = window.currentEditData || updatedTask;
+                
+                const response = await fetch(`${API_URL}/api/apply-edit/${sessionId}?task_id=${editingTaskId}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(editData)
+                });
+                
+                const data = await response.json();
+                console.log('Apply edit response:', data);
+                
+                if (data.status === 'success') {
+                    addMessage('✅ Task updated successfully!', 'system');
+                    
+                    // Refresh the TODO list
+                    console.log('🔵 Refreshing tasks from session:', sessionId);
+                    const refreshResponse = await fetch(`${API_URL}/api/get-tasks/${sessionId}`);
+                    
+                    if (!refreshResponse.ok) {
+                        console.error('❌ Refresh failed:', refreshResponse.status, refreshResponse.statusText);
+                        addMessage(`Error refreshing tasks: ${refreshResponse.status} ${refreshResponse.statusText}`, 'system');
+                    } else {
+                        const refreshData = await refreshResponse.json();
+                        console.log('✅ Refresh response:', refreshData);
+                        
+                        if (refreshData.status === 'success') {
+                            displayTodos(refreshData.tasks, refreshData.total);
+                        } else {
+                            addMessage(`Error: ${refreshData.message}`, 'system');
+                        }
+                    }
+                } else {
+                    addMessage(`Error: ${data.message}`, 'system');
+                }
+                
+                // Back to confirmation menu
+                document.getElementById('options').className = 'options hidden';
+                showConfirmOptions();
+                currentState = 'confirm';
+                document.getElementById('sendBtn').onclick = sendMessage;
+                
+            } catch (error) {
+                console.error('❌ Error in applyEdit:', error);
+                addMessage(`Error: ${error.message}`, 'system');
+            }
+        }
+
+        function retryEdit() {
+            document.getElementById('options').className = 'options hidden';
+            addMessage('What would you like to change instead?', 'agent');
+            currentState = 'edit_request';
+            document.getElementById('sendBtn').onclick = handleEditRequest;
+        }
+
+        function cancelEdit() {
+            document.getElementById('options').className = 'options hidden';
+            addMessage('Edit cancelled. Back to confirmation menu.', 'system');
+            showConfirmOptions();
+            currentState = 'confirm';
+            document.getElementById('sendBtn').onclick = sendMessage;
+        }
+
+        async function refreshTodoList() {
+            try {
+                const response = await fetch(`${API_URL}/api/get-tasks/${sessionId}`);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    displayTodos(data.tasks, data.total);
+                }
+            } catch (error) {
+                console.error('Error refreshing TODO list:', error);
+            }
+        }
+
+        async function approveAndExecute() {
+            document.getElementById('options').className = 'options hidden';
+            addMessage('Starting execution...', 'system');
+            
+            try {
+                const ws = new WebSocket(`ws://127.0.0.1:8007/ws/${sessionId}`);
+                
+                ws.onopen = () => {
+                    console.log('✅ WebSocket connected');
+                };
+                
+                ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    
+                    if (data.type === 'task_start') {
+                        addMessage(`🔄 Executing: <strong>${data.task.title}</strong>`, 'system');
+                    } else if (data.type === 'task_complete') {
+                        const statusClass = data.status === 'done' ? 'done' : (data.status === 'failed' ? 'failed' : 'progress');
+                        addMessage(`
+                            <strong>Task #${data.task_id} Result:</strong>
+                            <span class="status-badge status-${statusClass}">${data.status}</span>
+                            <br>
+                            📝 ${data.output}
+                            <br>
+                            💭 ${data.reflection}
+                        `, 'system');
+                    } else if (data.type === 'complete') {
+                        addMessage(`
+                            <strong>🎉 All tasks completed!</strong><br>
+                            ✅ Done: ${data.summary.done} | 
+                            ❌ Failed: ${data.summary.failed} | 
+                            🔄 Follow-up: ${data.summary.needs_follow_up}
+                        `, 'system');
+                        currentState = 'initial';
+                        document.getElementById('sendBtn').onclick = sendMessage;
+                        addMessage('What else would you like to build?', 'agent');
+                    } else if (data.type === 'error') {
+                        addMessage(`Error: ${data.message}`, 'system');
+                    }
+                };
+                
+                ws.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                    addMessage('❌ WebSocket connection error. Please check if backend is running.', 'system');
+                };
+                
+                ws.onclose = () => {
+                    console.log('WebSocket closed');
+                };
+                
+            } catch (error) {
+                addMessage(`Error: ${error.message}`, 'system');
+            }
+        }
+
+        async function regenerate() {
+            document.getElementById('options').className = 'options hidden';
+            questionAnswers = [];
+            addMessage('Regenerating TODO list...', 'system');
+            await generateTodos();
+        }
+
+        function cancel() {
+            document.getElementById('options').className = 'options hidden';
+            addMessage('Cancelled. What else would you like to build?', 'agent');
+            currentState = 'initial';
+            sessionId = null;
+            currentGoal = '';
+            document.getElementById('sendBtn').onclick = sendMessage;
+        }
+
+        // Enter key to send
+        document.getElementById('userInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('sendBtn').click();
+            }
+        });
+    </script>
+</body>
+</html>
+
